@@ -16,6 +16,7 @@ const ttf2woff2 = require('gulp-ttf2woff2');
 const webp = require('gulp-webp');
 const webphtml = require('gulp-webp-html');
 const webpcss = require("gulp-webpcss");
+const changed = require('gulp-changed');
 
 
 const src = {
@@ -116,20 +117,22 @@ function fonts() {
 
 
 function compress () {
-  return gulp.src(src.img)
-    .pipe(
-        webp({
-            quality: 70
-        }))
-    .pipe(gulp.dest(build.img))
+    return gulp.src(src.img)
+    .pipe(changed(build.img))
+        .pipe(
+            webp({
+                quality: 70
+            }))
+        .pipe(gulp.dest(build.img))
+        
     .pipe(gulp.src(src.img))
-    .pipe(imagemin({
-        progressive: true,
-        svgoPlugins: [{removeViewBox: false}],
-        interlaced: true,
-        optimizationlevel: 5
-    }))
-    .pipe(gulp.dest(build.img))
+        .pipe(imagemin({
+            progressive: true,
+            svgoPlugins: [{removeViewBox: false}],
+            interlaced: true,
+            optimizationlevel: 5
+        }))
+        .pipe(gulp.dest(build.img))
     .pipe(browserSync.stream())
 }
 
