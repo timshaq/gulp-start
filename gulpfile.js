@@ -17,6 +17,7 @@ const webp = require('gulp-webp');
 const webphtml = require('gulp-webp-html');
 const webpcss = require("gulp-webpcss");
 const changed = require('gulp-changed');
+const fileinclude = require("gulp-file-include");
 
 
 const src = {
@@ -27,7 +28,8 @@ const src = {
     lib: './src/lib/**/*',
     fonts: './src/fonts/**/*',
     ttfFonts: './src/fonts/**/*.ttf',
-    html: './src/*.html'
+    html: './src/*.html',
+    htmlComponents: './src/html/**/*.html'
 
 }
 
@@ -35,7 +37,7 @@ const src = {
 const build = {
     
     js: './build/js/',
-    css: './build/sass/',
+    css: './build/css/',
     img: './build/img/',
     lib: './build/lib/',
     fonts: './build/fonts/',
@@ -55,6 +57,7 @@ function styles() {
     .pipe(sourcemaps.init())
     .pipe(concat(`style.css`))
     .pipe(webpcss({webpClass: '.webp', noWebpClass: '.no-webp'}))
+        .pipe(sourcemaps.write('/srcmaps/'))
         .pipe(gulp.dest(build.css))
     .pipe(cleanCSS({
         level: 2 
@@ -64,7 +67,6 @@ function styles() {
                 extname: ".min.css"
             })
         )
-    .pipe(sourcemaps.write('/srcmaps/'))
     .pipe(gulp.dest(build.css))
     .pipe(browserSync.stream())
 }
@@ -142,6 +144,7 @@ function clean() {
 
 function html() {
     return gulp.src(src.html)
+        .pipe(fileinclude())
         .pipe(webphtml())
         .pipe(gulp.dest(build.html))
 }
@@ -150,7 +153,8 @@ function watch() {
     browserSync.init({
         server: {
             baseDir: "./",
-            index: 'src/index.html'
+            index: 'build/index.html',
+            directory: true
         }
     });
     // SASS
@@ -160,6 +164,7 @@ function watch() {
     gulp.watch(src.lib, libraries)
     gulp.watch(src.fonts, fonts)
     gulp.watch(src.html, html).on('change', browserSync.reload);
+    gulp.watch(src.htmlComponents, html).on('change', browserSync.reload);
 }
 
 
